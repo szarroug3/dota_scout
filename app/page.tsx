@@ -3,6 +3,7 @@ import Link from "next/link"
 import { siteConfig } from "@/config/site"
 import { buttonVariants } from "@/components/ui/button"
 import DemoPage from "./players/page"
+import { InputForm } from "./input_form/page"
 
 export default function IndexPage() {
   return (
@@ -34,6 +35,11 @@ export default function IndexPage() {
         >
           GitHub
         </Link>
+      </div>
+      <div>
+        <InputForm />
+      </div>
+      <div>
         <DemoPage />
       </div>
     </section>
