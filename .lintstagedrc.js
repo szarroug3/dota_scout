@@ -5,6 +5,9 @@ const buildEslintCommand = (filenames) =>
     .map((f) => path.relative(process.cwd(), f))
     .join(' --file ')}`;
 
+const depCheckCommand = 'bash -c "npx depcheck"';
+
 module.exports = {
   '*.{js,jsx,ts,tsx}': [buildEslintCommand],
+  'package.json': [depCheckCommand],
 };

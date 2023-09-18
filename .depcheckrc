@@ -1,0 +1,7 @@
+ignores: [
+  '@types/node',
+  '@ianvs/prettier-plugin-sort-imports',
+  'autoprefixer',
+  'git-format-staged',
+  'lint-staged'
+]

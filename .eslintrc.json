@@ -7,17 +7,20 @@
     "plugin:tailwindcss/recommended",
     "plugin:prettier/recommended"
   ],
-  "plugins": [
-    "tailwindcss",
-    "prettier"
-  ],
+  "plugins": ["unused-imports", "tailwindcss", "prettier"],
   "rules": {
     "@next/next/no-html-link-for-pages": "off",
     "react/jsx-key": "off",
     "tailwindcss/no-custom-classname": "off",
     "prettier/prettier": "error",
     "arrow-body-style": "off",
-    "prefer-arrow-callback": "off"
+    "prefer-arrow-callback": "off",
+    "no-unused-vars": "off", // or "@typescript-eslint/no-unused-vars": "off",
+		"unused-imports/no-unused-imports": "error",
+		"unused-imports/no-unused-vars": [
+			"warn",
+			{ "vars": "all", "varsIgnorePattern": "^_", "args": "after-used", "argsIgnorePattern": "^_" }
+		]
   },
   "settings": {
     "tailwindcss": {
