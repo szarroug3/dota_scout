@@ -1,4 +1,4 @@
-import { Store } from "../vercel/store";
+import { Store } from '../vercel/store';
 
 const store = new Store();
 
@@ -11,4 +11,3 @@ export class HeroStore {
     return store.set(`heroes`, heroes);
   }
 }
-

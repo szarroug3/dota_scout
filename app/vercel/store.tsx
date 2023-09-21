@@ -1,4 +1,4 @@
-import { kv } from "@vercel/kv";
+import { kv } from '@vercel/kv';
 
 export class Store {
   prefix: string;
@@ -13,7 +13,9 @@ export class Store {
 
   date(): string {
     const date = new Date();
-    return date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate();
+    return (
+      date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate()
+    );
   }
 
   unwrap(wrapped: any, filterDate: boolean = false) {
@@ -23,11 +25,11 @@ export class Store {
     }
     return data;
   }
-  
-  wrap(data: any): { date: any, data: any } {
+
+  wrap(data: any): { date: any; data: any } {
     return {
       date: this.date(),
-      data: data
+      data: data,
     };
   }
 
@@ -38,7 +40,7 @@ export class Store {
 
   async set(key: string, value: any) {
     const prefixedKey = this.prefixedKey(key);
-    kv.set(prefixedKey, this.wrap(value)).then(ok => {
+    kv.set(prefixedKey, this.wrap(value)).then((ok) => {
       if (ok === 'OK') {
         throw new Error(`Failed to save ${key}`);
       }

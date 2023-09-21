@@ -1,4 +1,4 @@
-import { Store } from "../vercel/store";
+import { Store } from '../vercel/store';
 
 const store = new Store('team');
 
@@ -11,5 +11,3 @@ export class TeamStore {
     return store.set(`${teamId}`, data);
   }
 }
-
-
