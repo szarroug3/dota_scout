@@ -4,18 +4,18 @@ interface Match {
   matchId: number;
   firstPick?: boolean;
   radiantOrDire?: string;
-  heroesPicked?: string[];
-  heroesBannedByTeam?: string[];
-  heroesBannedByEnemy?: string[];
+  heroesPicked?: Array<string>;
+  heroesBannedByTeam?: Array<string>;
+  heroesBannedByEnemy?: Array<string>;
   captain?: Player;
-  players?: Player[];
-  playerPositions?: {
+  players?: Array<Player>;
+  playerPositions?: Array<{
     player: Player;
     hero: string;
     position: string;
     role: string;
     isRoaming: boolean;
-  }[];
+  }>;
 }
 
 export type { Match };

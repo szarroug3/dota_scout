@@ -10,7 +10,7 @@ import { SiteHeader } from '@/components/site-header';
 import { TailwindIndicator } from '@/components/tailwind-indicator';
 import { ThemeProvider } from '@/components/theme-provider';
 
-export const metadata: Metadata = {
+const metadata: Metadata = {
   title: {
     default: siteConfig.name,
     template: `%s - ${siteConfig.name}`,
@@ -31,7 +31,7 @@ interface RootLayoutProps {
   children: React.ReactNode;
 }
 
-export default function RootLayout({ children }: RootLayoutProps) {
+function RootLayout({ children }: RootLayoutProps) {
   return (
     <>
       <html lang='en' suppressHydrationWarning>
@@ -55,3 +55,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
     </>
   );
 }
+
+export { metadata };
+export default RootLayout;

@@ -3,14 +3,30 @@
 import { Heroes, PlayerHero } from '@/types/hero';
 import { PlayerInfo } from '@/types/player';
 
-import {
-  fetchOpenDotaPlayerHeroes,
-  fetchOpenDotaPlayerInfo,
-  fetchOpenDotaPlayerMatches,
-} from './api';
-import { fetchFromCacheOrApi } from './common';
+import { fetchOpenDotaData } from './api';
 
-const ranks: { [key: string]: string } = {
+interface InputPlayerInfo {
+  rank_tier: number;
+  leaderboard_rank: number;
+  profile: {
+    personaname: string;
+    avatarfull: string;
+  };
+}
+
+interface InputPlayerHero {
+  hero_id: number;
+  win: number;
+  games: number;
+}
+
+interface InputPlayerMatch {
+  hero_id: number;
+  radiant_win: boolean;
+  player_slot: number;
+}
+
+const ranks: Record<string, string> = {
   '1': 'Herald',
   '2': 'Guardian',
   '3': 'Crusader',
@@ -21,35 +37,50 @@ const ranks: { [key: string]: string } = {
   '8': 'Immortal',
 };
 
-const getOpenDotaPlayerInfo = async (
-  playerId: number,
-  update: boolean
-): Promise<PlayerInfo> => {
-  const cacheKey = `openDotaPlayerInfo_${playerId}`;
+const fetchOpenDotaPlayerInfo = async (
+  playerId: number
+): Promise<InputPlayerInfo> => {
+  console.info(`Getting player ${playerId} from OpenDota.`);
+  return fetchOpenDotaData<InputPlayerInfo>(`players/${playerId}`);
+};
 
-  const playerInfo = await fetchFromCacheOrApi(
-    cacheKey,
-    () => fetchOpenDotaPlayerInfo(playerId),
-    true,
-    update
+const fetchOpenDotaPlayerHeroes = async (
+  playerId: number
+): Promise<Array<InputPlayerHero>> => {
+  console.info(`Getting player ${playerId}'s heroes from OpenDota.`);
+  return fetchOpenDotaData<Array<InputPlayerHero>>(
+    `players/${playerId}/heroes`
   );
+};
 
-  if (!playerInfo) {
-    throw new Error(`Couldn't get player info for ${playerId}.`);
-  }
+const fetchOpenDotaPlayerMatches = async (
+  playerId: number
+): Promise<Array<InputPlayerMatch>> => {
+  console.info(`Getting player ${playerId}'s recent matches from OpenDota.`);
+  const data = fetchOpenDotaData<Array<InputPlayerMatch>>(
+    `players/${playerId}/matches`,
+    {
+      date: '90',
+    }
+  );
+  return data;
+};
+
+const getOpenDotaPlayerInfo = async (playerId: number): Promise<PlayerInfo> => {
+  const data = await fetchOpenDotaPlayerInfo(playerId);
 
   let medal = '0';
   let stars = '';
   let immortalRank = '';
   let altText = 'Unranked';
+  const rankTier = data.rank_tier.toString();
 
-  if (playerInfo.rank_tier) {
-    const rankTier = playerInfo.rank_tier.toString();
+  if (rankTier) {
     medal = rankTier[0];
     altText = ranks[medal];
 
-    if (rankTier[0] === '8') {
-      immortalRank = playerInfo.leaderboard_rank;
+    if (rankTier.startsWith('8')) {
+      immortalRank = data.leaderboard_rank.toString();
       altText.concat(' ', immortalRank);
     } else {
       stars = rankTier[1];
@@ -58,8 +89,8 @@ const getOpenDotaPlayerInfo = async (
   }
 
   return {
-    name: playerInfo.profile.personaname,
-    picture: playerInfo.profile.avatarfull,
+    name: data.profile.personaname,
+    picture: data.profile.avatarfull,
     rank: {
       altText,
       medal,
@@ -71,21 +102,9 @@ const getOpenDotaPlayerInfo = async (
 
 const getOpenDotaPlayerHeroes = async (
   playerId: number,
-  heroes: Heroes,
-  update: boolean
+  heroes: Heroes
 ): Promise<Array<PlayerHero>> => {
-  const cacheKey = `openDotaPlayerHeroes_${playerId}`;
-
-  const playerHeroes = await fetchFromCacheOrApi(
-    cacheKey,
-    () => fetchOpenDotaPlayerHeroes(playerId),
-    true,
-    update
-  );
-
-  if (!heroes) {
-    throw new Error(`Couldn't get player heroes for ${playerId}.`);
-  }
+  const playerHeroes = await fetchOpenDotaPlayerHeroes(playerId);
 
   return playerHeroes.map(
     ({
@@ -110,25 +129,13 @@ const getOpenDotaPlayerHeroes = async (
 
 const getOpenDotaPlayerMatches = async (
   playerId: number,
-  heroes: Heroes,
-  update: boolean
+  heroes: Heroes
 ): Promise<Array<PlayerHero>> => {
-  const cacheKey = `openDotaPlayerMatches_${playerId}`;
+  const data = await fetchOpenDotaPlayerMatches(playerId);
 
-  const matches = await fetchFromCacheOrApi(
-    cacheKey,
-    () => fetchOpenDotaPlayerMatches(playerId),
-    true,
-    update
-  );
+  const heroCounts: Record<number, PlayerHero> = {};
 
-  if (!matches) {
-    throw new Error(`Couldn't get player matches for ${playerId}.`);
-  }
-
-  const heroCounts: { [id: number]: PlayerHero } = {};
-
-  matches.forEach(
+  data.forEach(
     ({
       hero_id,
       radiant_win,

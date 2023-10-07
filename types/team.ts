@@ -4,8 +4,8 @@ import { Player } from './player';
 interface Team {
   teamId: number;
   name: string;
-  players?: Player[];
-  matches?: Match[];
+  players?: Array<Player>;
+  matches?: Array<Match>;
   teamCaptain?: Player;
 }
 

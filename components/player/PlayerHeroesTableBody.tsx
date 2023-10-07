@@ -6,7 +6,7 @@ const PlayerHeroesTableBody = <TData,>({
   data,
   columnCount,
 }: {
-  data: Row<TData>[];
+  data: Array<Row<TData>>;
   columnCount: number;
 }) => {
   return (

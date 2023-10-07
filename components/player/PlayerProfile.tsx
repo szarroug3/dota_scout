@@ -10,10 +10,14 @@ import { Heroes, PlayerHero } from '@/types/hero';
 import { PlayerInfo } from '@/types/player';
 import { cn } from '@/lib/utils';
 
+import { removePlayerType } from '../Dashboard';
 import { Card } from '../ui/card';
 import { Separator } from '../ui/separator';
 import PlayerProfileHeader from './PlayerProfileHeader';
 import PlayerTable from './PlayerTable';
+
+type refreshPlayerProfileType = () => void;
+type removePlayerProfileType = () => void;
 
 const PlayerProfile = ({
   playerId,
@@ -23,7 +27,7 @@ const PlayerProfile = ({
 }: {
   playerId: number;
   heroes: Heroes;
-  removePlayer: Function;
+  removePlayer: removePlayerType;
   hide: boolean;
 }) => {
   const [, setError] = useState();
@@ -36,70 +40,50 @@ const PlayerProfile = ({
   const [loadingMost, setLoadingMost] = useState(true);
   const [mostPlayed, setMostPlayed] = useState(new Array<PlayerHero>());
 
-  const getPlayerInfo = useCallback(
-    async (update: boolean = false) => {
-      setLoadingInfo(true);
-      getOpenDotaPlayerInfo(playerId, update)
-        .then((data) => {
-          setInfo(() => data);
-          setLoadingInfo(false);
-        })
-        .catch((err) => {
-          setError(() => {
-            throw err;
-          });
-        });
-    },
-    [playerId]
-  );
+  const getPlayerInfo = useCallback(async () => {
+    setLoadingInfo(true);
+    const data = await getOpenDotaPlayerInfo(playerId);
+    setInfo(() => data);
+    setLoadingInfo(false);
+  }, [playerId]);
 
-  const getPlayerRecentHeroes = useCallback(
-    async (update: boolean = false) => {
-      setLoadingRecent(true);
-      getOpenDotaPlayerMatches(playerId, heroes, update)
-        .then((data) => {
-          setRecentlyPlayed(() => data);
-          setLoadingRecent(false);
-        })
-        .catch((err) => {
-          setError(() => {
-            throw err;
-          });
-        });
-    },
-    [heroes, playerId]
-  );
+  const getPlayerRecentHeroes = useCallback(async () => {
+    setLoadingRecent(true);
+    const data = await getOpenDotaPlayerMatches(playerId, heroes);
+    setRecentlyPlayed(() => data);
+    setLoadingRecent(false);
+  }, [heroes, playerId]);
 
-  const getPlayerMostHeroes = useCallback(
-    async (update: boolean = false) => {
-      setLoadingMost(true);
-      getOpenDotaPlayerHeroes(playerId, heroes, update)
-        .then((data) => {
-          setMostPlayed(() => data);
-          setLoadingMost(false);
-        })
-        .catch((err) => {
-          setError(() => {
-            throw err;
-          });
-        });
-    },
-    [heroes, playerId]
-  );
+  const getPlayerMostHeroes = useCallback(async (): Promise<void> => {
+    setLoadingMost(true);
+    const data = await getOpenDotaPlayerHeroes(playerId, heroes);
+    setMostPlayed(() => data);
+    setLoadingMost(false);
+  }, [heroes, playerId]);
 
-  const refreshPlayer = async () => {
-    getPlayerInfo(true);
-    getPlayerRecentHeroes(true);
-    getPlayerMostHeroes(true);
-  };
+  const getPlayer = useCallback(() => {
+    getPlayerInfo().catch((err) =>
+      setError(() => {
+        throw err;
+      })
+    );
+    getPlayerRecentHeroes().catch((err) =>
+      setError(() => {
+        throw err;
+      })
+    );
+    getPlayerMostHeroes().catch((err) =>
+      setError(() => {
+        throw err;
+      })
+    );
+  }, [getPlayerInfo, getPlayerRecentHeroes, getPlayerMostHeroes]);
 
   useEffect(() => {
     if (!_.isEmpty(heroes)) {
-      getPlayerInfo();
-      getPlayerRecentHeroes();
-      getPlayerMostHeroes().finally(() => setLoadingMost(false));
+      getPlayer();
     }
-  }, [heroes, getPlayerInfo, getPlayerRecentHeroes, getPlayerMostHeroes]);
+  }, [heroes, getPlayer]);
 
   return (
     <Card className={cn(hide && 'hidden')}>
@@ -114,13 +98,14 @@ const PlayerProfile = ({
         loadingRecent={loadingRecent}
         mostPlayed={mostPlayed}
         loadingMost={loadingMost}
-        refreshPlayer={refreshPlayer}
+        refreshPlayer={getPlayer}
         removePlayer={() => removePlayer(playerId)}
       />
     </Card>
   );
 };
 
-export default PlayerProfile;
-
 PlayerProfile.displayName = 'PlayerProfile';
+
+export type { refreshPlayerProfileType, removePlayerProfileType };
+export default PlayerProfile;

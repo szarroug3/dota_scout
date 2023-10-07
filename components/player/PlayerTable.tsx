@@ -7,6 +7,10 @@ import { Button } from '../ui/button';
 import { CardContent } from '../ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import PlayerHeroesTable from './PlayerHeroesTable';
+import {
+  refreshPlayerProfileType,
+  removePlayerProfileType,
+} from './PlayerProfile';
 
 const renderSortIcon = (sorted: boolean | string) => {
   switch (sorted) {
@@ -30,7 +34,7 @@ const sortColumn = (column: Column<PlayerHero, unknown>) => {
   }
 };
 
-const columns: ColumnDef<PlayerHero>[] = [
+const columns: Array<ColumnDef<PlayerHero>> = [
   {
     accessorKey: 'name',
     header: ({ column }) => (
@@ -93,12 +97,12 @@ const PlayerTable = ({
   refreshPlayer,
   removePlayer,
 }: {
-  recentlyPlayed: PlayerHero[];
+  recentlyPlayed: Array<PlayerHero>;
   loadingRecent: boolean;
-  mostPlayed: PlayerHero[];
+  mostPlayed: Array<PlayerHero>;
   loadingMost: boolean;
-  refreshPlayer: Function;
-  removePlayer: Function;
+  refreshPlayer: refreshPlayerProfileType;
+  removePlayer: removePlayerProfileType;
 }) => {
   return (
     <CardContent className='p-4'>

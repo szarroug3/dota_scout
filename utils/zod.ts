@@ -1,6 +1,8 @@
-import { z, ZodTypeAny } from 'zod';
+import { z, ZodEffects, ZodNumber, ZodString, ZodUnion } from 'zod';
 
-export const ZodDotaId = (fieldName: string): ZodTypeAny =>
+export const ZodDotaId = (
+  fieldName: string
+): ZodEffects<ZodUnion<[ZodNumber, ZodString]>, string | number, unknown> =>
   z.preprocess((input, ctx) => {
     if (!input) {
       return input;
@@ -11,6 +13,7 @@ export const ZodDotaId = (fieldName: string): ZodTypeAny =>
       .regex(/^\d+$/)
       .transform(Number)
       .safeParse(input);
+
     if (!processed.success || processed.data <= 0) {
       ctx.addIssue({
         code: 'custom',
@@ -19,5 +22,6 @@ export const ZodDotaId = (fieldName: string): ZodTypeAny =>
       });
       return input;
     }
+
     return processed.data;
   }, z.number().or(z.string()));

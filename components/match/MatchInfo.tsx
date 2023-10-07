@@ -23,20 +23,17 @@ const MatchInfo = ({
   const [, setError] = useState();
 
   const getMatch = useCallback(async () => {
-    getOpenDotaMatchInfo(matchId)
-      .then((data) => {
-        setMatchInfo(() => data);
-      })
-      .catch((err) => {
-        setError(() => {
-          throw err;
-        });
-      });
+    const data = await getOpenDotaMatchInfo(matchId);
+    setMatchInfo(() => data);
   }, [matchId]);
 
   useEffect(() => {
     if (!_.isEmpty(heroes)) {
-      getMatch();
+      getMatch().catch((err) =>
+        setError(() => {
+          throw err;
+        })
+      );
     }
   }, [heroes, getMatch]);
 
@@ -47,6 +44,6 @@ const MatchInfo = ({
   );
 };
 
-export default MatchInfo;
-
 MatchInfo.displayName = 'MatchInfo';
+
+export default MatchInfo;

@@ -34,17 +34,16 @@ const InputForm = ({
       inputId: '',
     },
   });
-  const handleSubmit = async (data: z.infer<typeof schema>) => {
-    if (!data.inputId) {
+  const handleSubmit = (data: z.infer<typeof schema>) => {
+    if (data.inputId) {
+      onSubmit(Number(data.inputId));
+      form.reset({ inputId: '' });
+    } else {
       form.control.setError('inputId', {
         type: 'required',
         message: `${param} ID is required.`,
       });
-      return;
     }
-
-    onSubmit(data.inputId);
-    form.reset({ inputId: '' });
   };
 
   return (

@@ -1,9 +1,8 @@
 'use client';
 
-import { ReactElement, useEffect, useState } from 'react';
+import { ReactElement, useCallback, useEffect, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { getOpenDotaHeroes } from '@/data/heroes';
-import { ToastAction } from '@radix-ui/react-toast';
 import _ from 'lodash';
 
 import { Heroes } from '@/types/hero';
@@ -15,9 +14,10 @@ import InputForm from './SingleInputForm';
 import { Card } from './ui/card';
 import { useToast } from './ui/use-toast';
 
-interface addInputType {
-  (_inputId: number): Promise<void>;
-}
+type addInputType = (_inputId: number) => void;
+type refreshPlayerType = (playerId: number) => void;
+type removePlayerType = (playerId: number) => void;
+type onErrorType = () => void;
 
 const Dashboard = (): ReactElement => {
   const pathName = usePathname();
@@ -25,46 +25,36 @@ const Dashboard = (): ReactElement => {
   const router = useRouter();
   const { toast } = useToast();
 
-  const inputPlayerIds = searchParams.getAll('playerId') || new Array<String>();
+  const inputPlayerIds = searchParams.getAll('playerId') || new Array<string>();
   const [playerIds, setPlayerIds] = useState(
     new Map(inputPlayerIds.map((id) => [Number(id), false]))
   );
 
-  const inputMatchIds = searchParams.getAll('matchId') || new Array<String>();
+  const inputMatchIds = searchParams.getAll('matchId') || new Array<string>();
   const [matchIds, setMatchIds] = useState(
     inputMatchIds.map((id) => Number(id))
   );
 
   const [heroes, setHeroes] = useState<Heroes>({});
 
-  useEffect(() => {
-    if (_.isEmpty(heroes)) {
-      getOpenDotaHeroes().then((openDotaHeroes) => {
-        if (openDotaHeroes) {
-          setHeroes(() => openDotaHeroes);
-        }
-      });
-    }
-  }, [heroes]);
-
-  const addMatch = async (matchId: number) => {
+  const addMatch = (matchId: number) => {
     if (!matchIds.includes(matchId)) {
       setMatchIds([...matchIds, matchId]);
       updateUrl();
     }
   };
 
-  const addPlayer = async (playerId: number) => {
+  const addPlayer = (playerId: number) => {
     setPlayerIds((ids) => ids.set(playerId, false));
     updateUrl();
   };
 
-  const removePlayer = async (playerId: number) => {
+  const removePlayer = (playerId: number) => {
     setPlayerIds((ids) => ids.set(playerId, true));
     updateUrl();
   };
 
-  const updateUrl = async () => {
+  const updateUrl = () => {
     const params = matchIds.map((id) => `matchId=${id}`);
     params.push(
       ...Array.from(playerIds.entries())
@@ -79,14 +69,26 @@ const Dashboard = (): ReactElement => {
     }
   };
 
-  const onError = (message: string) => {
-    toast({
-      variant: 'destructive',
-      title: 'Shit!',
-      description: message,
-      action: <ToastAction altText={message}>Try again.</ToastAction>,
-    });
-  };
+  const onError = useCallback(
+    (message: string) => {
+      toast({
+        variant: 'destructive',
+        title: 'Shit!',
+        description: message,
+      });
+    },
+    [toast]
+  );
+
+  useEffect(() => {
+    if (_.isEmpty(heroes)) {
+      getOpenDotaHeroes()
+        .then((openDotaHeroes) => {
+          setHeroes(() => openDotaHeroes);
+        })
+        .catch(() => onError('Could not get heroes. Try refreshing the page.'));
+    }
+  }, [heroes, onError]);
 
   return (
     <div className='flex w-full flex-col gap-6'>
@@ -99,7 +101,9 @@ const Dashboard = (): ReactElement => {
           <Card>
             {matchIds.map((matchId) => (
               <ErrorBoundary
-                onError={() => onError(`Couldn't get match ${matchId}.`)}
+                onError={() =>
+                  onError(`Couldn't get match ${matchId}. Try again.`)
+                }
                 key={`player-${matchId}-error`}
                 fallback={<></>}
               >
@@ -115,7 +119,9 @@ const Dashboard = (): ReactElement => {
         <div className='flex flex-wrap justify-center gap-6'>
           {Array.from(playerIds.entries()).map(([playerId, hide]) => (
             <ErrorBoundary
-              onError={() => onError(`Couldn't get player ${playerId}.`)}
+              onError={() =>
+                onError(`Couldn't get player ${playerId}. Try again.`)
+              }
               key={`player-${playerId}-error`}
               fallback={<></>}
             >
@@ -135,4 +141,4 @@ const Dashboard = (): ReactElement => {
 };
 
 export default Dashboard;
-export type { addInputType };
+export type { addInputType, refreshPlayerType, removePlayerType, onErrorType };

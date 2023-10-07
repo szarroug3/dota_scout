@@ -27,14 +27,18 @@ import Loading from '@/app/loading';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import PlayerHeroesTableBody from './PlayerHeroesTableBody';
+import {
+  refreshPlayerProfileType,
+  removePlayerProfileType,
+} from './PlayerProfile';
 
-export interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
+interface DataTableProps<TData, TValue> {
+  columns: Array<ColumnDef<TData, TValue>>;
+  data: Array<TData>;
   pageSize: number;
   loading: boolean;
-  refreshPlayer: Function;
-  removePlayer: Function;
+  refreshPlayer: refreshPlayerProfileType;
+  removePlayer: removePlayerProfileType;
 }
 
 const PlayerHeroesTable = <TData, TValue>({

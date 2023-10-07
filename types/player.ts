@@ -14,8 +14,8 @@ interface PlayerInfo {
 interface Player {
   accountId: number;
   data: PlayerInfo;
-  mostPlayedHeroes: PlayerHero[];
-  recentlyPlayedHeroes: PlayerHero[];
+  mostPlayedHeroes: Array<PlayerHero>;
+  recentlyPlayedHeroes: Array<PlayerHero>;
 }
 
 export type { Player, PlayerInfo };

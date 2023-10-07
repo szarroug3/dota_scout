@@ -1,85 +1,64 @@
 'use server';
 
-import axios from 'axios';
-
 // const OPENDOTA_API_KEY = process.env.OPENDOTA_API_KEY;
+if (!process.env.DOTA_API_KEY) {
+  throw new Error('Missing DOTA_API_KEY');
+}
 const DOTA_API_KEY = process.env.DOTA_API_KEY;
 
-const openDotaInstance = axios.create({
-  baseURL: 'https://api.opendota.com/api/',
-  // headers: { 'X-API-Key': OPENDOTA_API_KEY },
-});
-
-const dotaApiInstance = axios.create({
-  baseURL: 'https://api.steampowered.com/IDOTA2Match_570/',
-});
-
-const fetchOpenDotaData = async (
+const fetchOpenDotaData = async <T>(
   endpoint: string,
-  params: Record<string, string | number> = {}
-) => {
-  return openDotaInstance
-    .get(endpoint, {
-      params: params,
-    })
-    .then((response) => {
-      return response.data;
-    })
-    .catch((error) => {
-      console.error(`Error fetching OpenDota data: ${error}`);
-      throw error;
-    });
+  params: Record<string, string> = {}
+): Promise<T> => {
+  try {
+    const queryParams = new URLSearchParams(params).toString();
+    const response = await fetch(
+      `https://api.opendota.com/api/${endpoint}/?${queryParams}`
+    );
+
+    if (!response.ok) {
+      throw new Error(`${response.status} ${response.statusText}`);
+    }
+
+    const data = (await response.json()) as T;
+    if (!data) {
+      throw new Error(`Data not found.`);
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error fetching from OpenDota', error);
+    throw new Error('Error fetching from OpenDota');
+  }
 };
 
-const fetchDotaData = async (
+const fetchDotaData = async <T>(
   endpoint: string,
-  params: Record<string, string | number>
-) => {
-  return dotaApiInstance
-    .get(`${endpoint}/v1/`, {
-      params: { ...params, key: DOTA_API_KEY },
-    })
-    .then((response) => response.data)
-    .catch((error) => {
-      console.error(`Error fetching Dota data: ${error}`);
-      throw error;
-    });
+  params: Record<string, string>
+): Promise<T> => {
+  try {
+    const queryParams = new URLSearchParams({
+      ...params,
+      key: DOTA_API_KEY,
+    }).toString();
+    const response = await fetch(
+      `https://api.steampowered.com/IDOTA2Match_570/${endpoint}/v1/?${queryParams}`
+    );
+
+    if (!response.ok) {
+      throw new Error(`${response.status} ${response.statusText}`);
+    }
+
+    const data = (await response.json()) as T;
+    if (!data) {
+      throw new Error(`Data not found.`);
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error fetching from Dota API', error);
+    throw new Error('Error fetching from Dota API');
+  }
 };
 
-const fetchOpenDotaHeroes = async () => {
-  return fetchOpenDotaData('heroes');
-};
-
-const fetchOpenDotaPlayerInfo = async (playerId: number) => {
-  return fetchOpenDotaData(`players/${playerId}`);
-};
-
-const fetchOpenDotaMatchInfo = async (matchId: number) => {
-  return fetchOpenDotaData(`matches/${matchId}`);
-};
-
-const fetchOpenDotaPlayerHeroes = async (playerId: number) => {
-  return fetchOpenDotaData(`players/${playerId}/heroes`);
-};
-
-const fetchOpenDotaPlayerMatches = async (playerId: number) => {
-  return fetchOpenDotaData(`players/${playerId}/matches`, {
-    date: 90,
-  });
-};
-
-const fetchDotaTeamInfo = async (teamId: number) => {
-  return fetchDotaData('GetTeamInfoByTeamID', {
-    start_at_team_id: teamId,
-    teams_requested: '1',
-  });
-};
-
-export {
-  fetchOpenDotaHeroes,
-  fetchOpenDotaPlayerInfo,
-  fetchOpenDotaMatchInfo,
-  fetchOpenDotaPlayerHeroes,
-  fetchOpenDotaPlayerMatches,
-  fetchDotaTeamInfo,
-};
+export { fetchOpenDotaData, fetchDotaData };

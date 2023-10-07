@@ -1,12 +1,11 @@
-type Heroes = {
-  [id: number]: string;
-};
+type Heroes = Record<number, string>;
 
-type PlayerHero = {
+interface PlayerHero {
   id: number;
   name: string;
   wins: number;
   count: number;
   winRate: number;
-};
+}
+
 export type { Heroes, PlayerHero };

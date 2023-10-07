@@ -2,29 +2,27 @@
 
 import { Heroes } from '@/types/hero';
 
-import { fetchOpenDotaHeroes } from './api';
-import { fetchFromCacheOrApi } from './common';
+import { fetchOpenDotaData } from './api';
 
 interface InputHero {
   id: number;
   localized_name: string;
 }
 
-export const getOpenDotaHeroes = async (): Promise<Heroes | null> => {
-  const cacheKey = 'openDotaHeroesRaw';
-
-  const rawData = await fetchFromCacheOrApi(
-    cacheKey,
-    fetchOpenDotaHeroes,
-    true
-  );
-
-  if (!rawData) {
-    return null;
-  }
-
-  const heroes: Heroes = {};
-  rawData.forEach((hero: InputHero) => (heroes[hero.id] = hero.localized_name));
-
-  return heroes;
+const fetchOpenDotaHeroes = async (): Promise<Array<InputHero>> => {
+  console.info(`Getting heroes from OpenDota.`);
+  return fetchOpenDotaData<Array<InputHero>>('heroes');
 };
+
+const getOpenDotaHeroes = async (): Promise<Heroes> => {
+  const rawData = await fetchOpenDotaHeroes();
+  const heroes: Heroes = {};
+  return rawData.reduce((acc, hero) => {
+    return {
+      ...acc,
+      [hero.id]: hero.localized_name,
+    };
+  }, heroes);
+};
+
+export { getOpenDotaHeroes };

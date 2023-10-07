@@ -1,9 +1,11 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
 
+import { onErrorType } from './Dashboard';
+
 interface ErrorBoundaryProps {
   fallback: ReactNode;
   children?: ReactNode;
-  onError: Function;
+  onError: onErrorType;
 }
 
 interface ErrorBoundaryStates {
@@ -27,7 +29,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryStates> {
     //   in ErrorBoundary (created by App)
     //   in div (created by App)
     //   in App
-    this.props.onError(error);
+    this.props.onError();
     console.error(error, info.componentStack);
   }
 

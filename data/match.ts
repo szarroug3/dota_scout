@@ -2,27 +2,23 @@
 
 import { Match } from '@/types/match';
 
-import { fetchOpenDotaMatchInfo } from './api';
-import { fetchFromCacheOrApi } from './common';
+import { fetchOpenDotaData } from './api';
+
+interface InputMatch {
+  match_id: number;
+}
+
+const fetchOpenDotaMatchInfo = async (matchId: number) => {
+  console.info(`Getting match ${matchId} from OpenDota.`);
+  return fetchOpenDotaData<InputMatch>(`matches/${matchId}`);
+};
 
 const getOpenDotaMatchInfo = async (matchId: number): Promise<Match> => {
-  const cacheKey = `openDotaMatchInfo_${matchId}`;
+  const data = await fetchOpenDotaMatchInfo(matchId);
 
-  return fetchFromCacheOrApi(
-    cacheKey,
-    () => fetchOpenDotaMatchInfo(matchId),
-    false
-  ).then((matchInfo) => {
-    if (!matchInfo) {
-      throw new Error(`Couldn't get match info for ${matchId}.`);
-    }
-
-    const processedMatchInfo: Match = {
-      matchId: matchId,
-    };
-
-    return processedMatchInfo;
-  });
+  return {
+    matchId: data.match_id,
+  };
 };
 
 export { getOpenDotaMatchInfo };

@@ -23,7 +23,7 @@ const PlayerProfileHeader = ({
             <div>
               <Avatar>
                 <AvatarImage src={data.picture} alt={data.name} />
-                <AvatarFallback>{data.name && data.name[0]}</AvatarFallback>
+                <AvatarFallback>{data.name?.[0]}</AvatarFallback>
               </Avatar>
             </div>
             {loading ? (

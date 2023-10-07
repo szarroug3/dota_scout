@@ -2,23 +2,29 @@
 
 import { Team } from '@/types/team';
 
-import { fetchDotaTeamInfo } from './api';
-import { fetchFromCacheOrApi } from './common';
+import { fetchDotaData } from './api';
 
-export const getDotaTeamInfo = async (teamId: number): Promise<Team | null> => {
-  const cacheKey = `dotaTeamInfo_${teamId}`;
+interface InputTeam {
+  team_id: number;
+  name: string;
+}
 
-  const teamInfo = await fetchFromCacheOrApi(
-    cacheKey,
-    () => fetchDotaTeamInfo(teamId),
-    false
-  );
+interface InputTeams {
+  teams: Array<InputTeam>;
+}
 
-  if (!teamInfo) {
-    return null;
-  }
+const fetchDotaTeamInfo = async (teamId: number): Promise<InputTeams> => {
+  console.info(`Getting team ${teamId} from Dota API.`);
+  return fetchDotaData<InputTeams>('GetTeamInfoByTeamID', {
+    start_at_team_id: teamId.toString(),
+    teams_requested: '1',
+  });
+};
 
-  const teamData = teamInfo.teams[0];
+const getDotaTeamInfo = async (teamId: number): Promise<Team> => {
+  const data = await fetchDotaTeamInfo(teamId);
+
+  const teamData = data.teams[0];
 
   const processedTeamInfo: Team = {
     teamId: teamId,
@@ -27,3 +33,5 @@ export const getDotaTeamInfo = async (teamId: number): Promise<Team | null> => {
 
   return processedTeamInfo;
 };
+
+export { getDotaTeamInfo };
