@@ -2,14 +2,14 @@ import { Player } from './player';
 
 interface Match {
   matchId: number;
-  firstPick: boolean;
-  radiantOrDire: string;
-  heroesPicked: string[];
-  heroesBannedByTeam: string[];
-  heroesBannedByEnemy: string[];
-  captain: Player;
-  players: Player[];
-  playerPositions: {
+  firstPick?: boolean;
+  radiantOrDire?: string;
+  heroesPicked?: string[];
+  heroesBannedByTeam?: string[];
+  heroesBannedByEnemy?: string[];
+  captain?: Player;
+  players?: Player[];
+  playerPositions?: {
     player: Player;
     hero: string;
     position: string;
@@ -18,6 +18,4 @@ interface Match {
   }[];
 }
 
-type PartialMatch = Partial<Match> & { matchId: number };
-
-export type { Match, PartialMatch };
+export type { Match };

@@ -115,7 +115,7 @@ const Dashboard = (): ReactElement => {
         <div className='flex flex-wrap justify-center gap-6'>
           {Array.from(playerIds.entries()).map(([playerId, hide]) => (
             <ErrorBoundary
-              onError={() => onError(`Couldn't get player ${playerId}`)}
+              onError={() => onError(`Couldn't get player ${playerId}.`)}
               key={`player-${playerId}-error`}
               fallback={<></>}
             >

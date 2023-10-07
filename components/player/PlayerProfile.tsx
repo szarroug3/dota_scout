@@ -26,6 +26,7 @@ const PlayerProfile = ({
   removePlayer: Function;
   hide: boolean;
 }) => {
+  const [, setError] = useState();
   const [info, setInfo] = useState<PlayerInfo>({});
   const [loadingInfo, setLoadingInfo] = useState(true);
 
@@ -40,11 +41,14 @@ const PlayerProfile = ({
       setLoadingInfo(true);
       getOpenDotaPlayerInfo(playerId, update)
         .then((data) => {
-          if (data) {
-            setInfo(data);
-          }
+          setInfo(() => data);
+          setLoadingInfo(false);
         })
-        .finally(() => setLoadingInfo(false));
+        .catch((err) => {
+          setError(() => {
+            throw err;
+          });
+        });
     },
     [playerId]
   );
@@ -54,12 +58,13 @@ const PlayerProfile = ({
       setLoadingRecent(true);
       getOpenDotaPlayerMatches(playerId, heroes, update)
         .then((data) => {
-          if (data) {
-            setRecentlyPlayed(() => data);
-          }
-        })
-        .finally(() => {
+          setRecentlyPlayed(() => data);
           setLoadingRecent(false);
+        })
+        .catch((err) => {
+          setError(() => {
+            throw err;
+          });
         });
     },
     [heroes, playerId]
@@ -70,12 +75,13 @@ const PlayerProfile = ({
       setLoadingMost(true);
       getOpenDotaPlayerHeroes(playerId, heroes, update)
         .then((data) => {
-          if (data) {
-            setMostPlayed(() => data);
-          }
-        })
-        .finally(() => {
+          setMostPlayed(() => data);
           setLoadingMost(false);
+        })
+        .catch((err) => {
+          setError(() => {
+            throw err;
+          });
         });
     },
     [heroes, playerId]

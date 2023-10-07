@@ -2,11 +2,9 @@
 
 import axios from 'axios';
 
-// Define your API keys
-const OPENDOTA_API_KEY = process.env.OPENDOTA_API_KEY;
+// const OPENDOTA_API_KEY = process.env.OPENDOTA_API_KEY;
 const DOTA_API_KEY = process.env.DOTA_API_KEY;
 
-// Create Axios instances
 const openDotaInstance = axios.create({
   baseURL: 'https://api.opendota.com/api/',
   // headers: { 'X-API-Key': OPENDOTA_API_KEY },

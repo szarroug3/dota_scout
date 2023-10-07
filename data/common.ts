@@ -28,23 +28,23 @@ export const fetchFromCacheOrApi = async (
   update: boolean = false
 ) => {
   if (!update) {
-    console.log(`Getting ${cacheKey} from store.`);
+    console.info(`Getting ${cacheKey} from store.`);
     const cachedData = await getCachedData(cacheKey, todayOnly);
 
     if (cachedData) {
-      console.log(`Got ${cacheKey} from store.`);
+      console.info(`Got ${cacheKey} from store.`);
       return cachedData;
     }
   }
 
-  console.log(`Getting ${cacheKey} from API.`);
+  console.info(`Getting ${cacheKey} from API.`);
   const rawData = await apiFunction();
 
   if (!rawData) {
     return null;
   }
 
-  console.log(`Got ${cacheKey} from API.`);
+  console.info(`Got ${cacheKey} from API.`);
   await cacheData(cacheKey, rawData);
 
   return rawData;

@@ -24,7 +24,7 @@ const ranks: { [key: string]: string } = {
 const getOpenDotaPlayerInfo = async (
   playerId: number,
   update: boolean
-): Promise<PlayerInfo | null> => {
+): Promise<PlayerInfo> => {
   const cacheKey = `openDotaPlayerInfo_${playerId}`;
 
   const playerInfo = await fetchFromCacheOrApi(
@@ -35,7 +35,7 @@ const getOpenDotaPlayerInfo = async (
   );
 
   if (!playerInfo) {
-    return null;
+    throw new Error(`Couldn't get player info for ${playerId}.`);
   }
 
   let medal = '0';
@@ -73,7 +73,7 @@ const getOpenDotaPlayerHeroes = async (
   playerId: number,
   heroes: Heroes,
   update: boolean
-): Promise<Array<PlayerHero> | null> => {
+): Promise<Array<PlayerHero>> => {
   const cacheKey = `openDotaPlayerHeroes_${playerId}`;
 
   const playerHeroes = await fetchFromCacheOrApi(
@@ -84,7 +84,7 @@ const getOpenDotaPlayerHeroes = async (
   );
 
   if (!heroes) {
-    return null;
+    throw new Error(`Couldn't get player heroes for ${playerId}.`);
   }
 
   return playerHeroes.map(
@@ -123,7 +123,7 @@ const getOpenDotaPlayerMatches = async (
   );
 
   if (!matches) {
-    throw matches;
+    throw new Error(`Couldn't get player matches for ${playerId}.`);
   }
 
   const heroCounts: { [id: number]: PlayerHero } = {};
