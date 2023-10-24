@@ -1,0 +1,12 @@
+ignores: [
+  '@types/node',
+  '@ianvs/prettier-plugin-sort-imports',
+  'autoprefixer',
+  'git-format-staged',
+  'lint-staged',
+  '@simbathesailor/use-what-changed',
+  '@testing-library/jest-dom',
+  '@testing-library/react',
+  'jest-environment-jsdom',
+  'ts-node'
+]

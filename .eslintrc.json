@@ -2,16 +2,65 @@
   "$schema": "https://json.schemastore.org/eslintrc",
   "root": true,
   "extends": [
+    "next",
     "next/core-web-vitals",
-    "prettier",
-    "plugin:tailwindcss/recommended"
+    "eslint:recommended",
+    "plugin:jest/style",
+    "plugin:@typescript-eslint/recommended-type-checked",
+    "plugin:@typescript-eslint/stylistic-type-checked",
+    "plugin:tailwindcss/recommended",
+    "plugin:prettier/recommended"
   ],
-  "plugins": ["tailwindcss"],
+  "plugins": [
+    "jest",
+    "@typescript-eslint",
+    "import",
+    "unused-imports",
+    "tailwindcss",
+    "prettier"
+  ],
   "rules": {
-    "@next/next/no-html-link-for-pages": "off",
+    "arrow-body-style": "off",
+    "import/no-unresolved": "error",
+    "import/exports-last": "error",
+    "no-unused-vars": "off",
     "react/jsx-key": "off",
-    "tailwindcss/no-custom-classname": "off"
+    "prefer-arrow-callback": "off",
+    "prettier/prettier": "error",
+    "tailwindcss/no-custom-classname": "off",
+    "unused-imports/no-unused-imports": "error",
+    "@next/next/no-html-link-for-pages": "off",
+    "@typescript-eslint/array-type": [
+      "warn",
+      {
+        "default": "generic"
+      }
+    ],
+    "@typescript-eslint/no-misused-promises": [
+      2,
+      {
+        "checksVoidReturn": {
+          "attributes": false
+        }
+      }
+    ],
+    "@typescript-eslint/no-unused-vars": "error",
+    "jest/no-disabled-tests": "warn",
+    "jest/no-focused-tests": "error",
+    "jest/no-identical-title": "error",
+    "jest/prefer-to-have-length": "warn",
+    "jest/valid-expect": "error"
   },
+  "overrides": [
+    {
+      "files": ["__test__/**"],
+      "plugins": ["jest"],
+      "extends": ["plugin:jest/recommended"],
+      "rules": {
+        "jest/prefer-expect-assertions": "off"
+      }
+    }
+  ],
   "settings": {
     "tailwindcss": {
       "callees": ["cn"],
@@ -19,12 +68,26 @@
     },
     "next": {
       "rootDir": ["./"]
+    },
+    "import/resolver": {
+      "typescript": {
+        "alwaysTryTypes": true
+      }
+    },
+    "jest": {
+      "globalAliases": {
+        "describe": ["context"],
+        "fdescribe": ["fcontext"],
+        "xdescribe": ["xcontext"]
+      }
     }
   },
-  "overrides": [
-    {
-      "files": ["*.ts", "*.tsx"],
-      "parser": "@typescript-eslint/parser"
-    }
-  ]
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": true,
+    "tsconfigRootDir": "."
+  },
+  "env": {
+    "jest/globals": true
+  }
 }
